@@ -33,6 +33,7 @@ async def on_message(message):
         e=discord.Embed()
         e.set_image(url=res.json()['preview'][-1])
         e.set_footer(text=res.json()['title'])
+        e.set_author(text=res.json()['author'])
         await message.channel.send(embed=e);
         print('picture from',res.json()['subreddit'], 'sent in ', message.guild);
         
