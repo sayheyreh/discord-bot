@@ -24,14 +24,16 @@ async def on_message(message):
     if message.author == bot.user:
         return;
     if message.content.startswith('$hello'):
-        await message.channel.send('hello');
+        await message.channel.send('hello ' + message.author.mention);
         print('Said Hello in', message.channel,' of ', message.guild);
         
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
-        await message.channel.send(res.json()['preview'][len(res.json()['preview'])-1]);
-        await message.channel.send(res.json()['title']);
+        e= discord.Embed()
+        e.set_image(url=res.json()['preview'][-1])
+        e.set_footer(text=res.json()['title'])
+        await message.channel.send(embed=e);
         print('picture from',res.json()['subreddit'], 'sent in ', message.guild);
         
 bot.run(key)
