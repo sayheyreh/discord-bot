@@ -30,7 +30,7 @@ async def on_message(message):
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
-        e= discord.Embed()
+        e=discord.Embed()
         e.set_image(url=res.json()['preview'][-1])
         e.set_footer(text=res.json()['title'])
         await message.channel.send(embed=e);
