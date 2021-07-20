@@ -12,6 +12,7 @@ bot = discord.Client();
 
 key = os.environ['API_KEY']
 meme_api = 'https://meme-api.herokuapp.com/gimme/'
+joke_api =  'https://official-joke-api.appspot.com/jokes/random'
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -58,5 +59,12 @@ async def on_message(message):
                 m = getInfo(user);
                 await message.channel.send(embed=m);
                 print(f'sent {user.id}\'s info in {message.guild}, {message.channel}');
+    
+    if message.content.startswith('$joke'):
+        res = requests.get(joke_api);
+        e=discord.Embed(title=res.json()['setup'],description=res.json()['punchline'],color=randColour())
+        user=message.author;
+        e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
+        await message.channel.send(embed=e);
         
 bot.run(key)
