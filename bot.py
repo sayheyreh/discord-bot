@@ -16,6 +16,7 @@ key = os.environ['API_KEY']
 meme_api = 'https://meme-api.herokuapp.com/gimme/'
 bored_api = 'http://www.boredapi.com/api/'
 joke_api = 'https://v2.jokeapi.dev/joke/Any'
+another_joke_api = 'https://official-joke-api.appspot.com/jokes/random'
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -45,6 +46,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    user=message.author;
     if message.author == bot.user:
         return;
     if message.content.startswith('$hello'):
@@ -76,7 +78,7 @@ async def on_message(message):
             return m.content!=None and m.channel==message.channel and m.author==message.author;
         await message.channel.send('Any type you prefer?\n`education`,`recreational`,`social`,`diy`,`charity`,`cooking`,`relaxation`,`music`,`busywork`\nif you do not have a preference, type `no`');
         msg = await bot.wait_for('message',check=check)
-        user=message.author;
+        
         if msg.content.lower() in activityTypes:
             res=requests.get(bored_api+'activity?type='+msg.content).json();
             e=boredEmbed(user,res)
@@ -91,13 +93,19 @@ async def on_message(message):
             await message.channel.send('Sorry Invalid Input')
             print(f'{user.id} entered the wrong input')
     if message.content.startswith('$joke'):
-        res=requests.get(joke_api).json()
-        if res['type']=='twopart':
-            e=discord.Embed(title=res['setup'],description=res['delivery'],color=randColour())
-            user=message.author;
-            e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
-            await message.channel.send(embed=e);
+        if random.randint(0,10) >=3:
+            res=requests.get(joke_api).json()
+            if res['type']=='twopart':
+                e=discord.Embed(title=res['setup'],description=res['delivery'],color=randColour())
+                e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
+                await message.channel.send(embed=e);
+            else:
+                e=discord.Embed(description=res['joke'])
+                e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
+                await message.channel.send(embed=e);
         else:
-            e=discord.Embed(title=res['joke'])
+            res = requests.get(another_joke_api).json();
+            e=discord.Embed(title=res['setup'],description=res['punchline'],color=randColour())
+            e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
             await message.channel.send(embed=e);
 bot.run(key)
