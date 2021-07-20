@@ -2,6 +2,7 @@
 import discord;
 import os
 import requests;
+import random;
 from dotenv import load_dotenv
 
 #for the environment variables, in this case, the key   
@@ -12,6 +13,8 @@ bot = discord.Client();
 key = os.environ['API_KEY']
 meme_api = 'https://meme-api.herokuapp.com/gimme/'
 
+def randColour():
+    return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
 
 @bot.event
 async def on_ready():
@@ -30,7 +33,7 @@ async def on_message(message):
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
-        e=discord.Embed(title=res.json()['title'])
+        e=discord.Embed(title=res.json()['title'],color=randColour())
         e.set_image(url=res.json()['preview'][-1])
         e.set_footer(text=res.json()['subreddit'])
         await message.channel.send(embed=e);
