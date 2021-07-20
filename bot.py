@@ -16,6 +16,15 @@ meme_api = 'https://meme-api.herokuapp.com/gimme/'
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
 
+def getInfo(u):
+            e=discord.Embed(title='User Info',colour=randColour())
+            e.set_image(url=u.avatar_url);
+            e.set_footer(text=u.id);
+            e.add_field(name='username',value=(u.name+'#'+u.discriminator));
+            e.add_field(name='nickname',value=u.display_name);
+            e.add_field(name='created_on',value=u.created_at);
+            e.add_field(name='avatar',value=u.avatar_url);
+            return e;
 @bot.event
 async def on_ready():
     print('logged in as {0.user}'.format(bot));
@@ -28,15 +37,26 @@ async def on_message(message):
         return;
     if message.content.startswith('$hello'):
         await message.channel.send('hello ' + message.author.mention);
-        print('Said Hello in', message.channel,' of ', message.guild);
+        print(f'Said Hello in {message.channel} of {message.guild}');
         
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
         e=discord.Embed(title=res.json()['title'],color=randColour())
         e.set_image(url=res.json()['preview'][-1])
-        e.set_footer(text=res.json()['subreddit'])
+        e.set_footer(text=res.json()['subreddit']);
         await message.channel.send(embed=e);
-        print('picture from',res.json()['subreddit'], 'sent in ', message.guild);
+        print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
+
+    if message.content.startswith('$info'):
+        if len(message.mentions)==0:
+            m = getInfo(message.author);
+            await message.channel.send(embed=m);
+            print(f'sent {message.author.id}\'s info in {message.guild}, {message.channel}');
+        else:
+            for user in message.mentions:
+                m = getInfo(user);
+                await message.channel.send(embed=m);
+                print(f'sent {user.id}\'s info in {message.guild}, {message.channel}');
         
 bot.run(key)
