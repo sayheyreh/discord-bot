@@ -20,10 +20,10 @@ def getInfo(u):
             e=discord.Embed(title='User Info',colour=randColour())
             e.set_image(url=u.avatar_url);
             e.set_footer(text=u.id);
-            e.add_field(name='username',value=(u.name+'#'+u.discriminator));
-            e.add_field(name='nickname',value=u.display_name);
-            e.add_field(name='created_on',value=u.created_at);
-            e.add_field(name='avatar',value=u.avatar_url);
+            e.add_field(name='username',value=(u.name+'#'+u.discriminator),inline=True);
+            e.add_field(name='nickname',value=u.display_name,inline=True);
+            e.add_field(name='created_on',value=u.created_at,inline=False);
+            e.add_field(name='avatar',value=u.avatar_url,inline=False);
             return e;
 @bot.event
 async def on_ready():
@@ -42,7 +42,7 @@ async def on_message(message):
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
-        e=discord.Embed(title=res.json()['title'],color=randColour())
+        e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
         e.set_image(url=res.json()['preview'][-1])
         e.set_footer(text=res.json()['subreddit']);
         await message.channel.send(embed=e);
