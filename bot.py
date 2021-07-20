@@ -14,8 +14,8 @@ bot = discord.Client();
 
 key = os.environ['API_KEY']
 meme_api = 'https://meme-api.herokuapp.com/gimme/'
-joke_api =  'https://official-joke-api.appspot.com/jokes/random'
 bored_api = 'http://www.boredapi.com/api/'
+joke_api = 'https://v2.jokeapi.dev/joke/Any'
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -71,12 +71,6 @@ async def on_message(message):
                 await message.channel.send(embed=m);
                 print(f'sent {user.id}\'s info in {message.guild}, {message.channel}');
     
-    if message.content.startswith('$joke'):
-        res = requests.get(joke_api);
-        e=discord.Embed(title=res.json()['setup'],description=res.json()['punchline'],color=randColour())
-        user=message.author;
-        e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
-        await message.channel.send(embed=e);
     if message.content.startswith('$bored'):
         def check(m):
             return m.content!=None and m.channel==message.channel and m.author==message.author;
@@ -87,10 +81,23 @@ async def on_message(message):
             res=requests.get(bored_api+'activity?type='+msg.content).json();
             e=boredEmbed(user,res)
             await message.channel.send(embed=e);
+            print(f'sent activity in {message.guild}, {message.channel}')
         elif msg.content.lower()=='no':
             res=requests.get(bored_api+'activity').json();
             e=boredEmbed(user,res)
             await message.channel.send(embed=e)
+            print(f'sent activity in {message.guild}, {message.channel}')
         else:
             await message.channel.send('Sorry Invalid Input')
+            print(f'{user.id} entered the wrong input')
+    if message.content.startswith('$joke'):
+        res=requests.get(joke_api).json()
+        if res['type']=='twopart':
+            e=discord.Embed(title=res['setup'],description=res['delivery'],color=randColour())
+            user=message.author;
+            e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
+            await message.channel.send(embed=e);
+        else:
+            e=discord.Embed(title=res['joke'])
+            await message.channel.send(embed=e);
 bot.run(key)
