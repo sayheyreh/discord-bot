@@ -1,8 +1,7 @@
 # pyright: reportMissingImports=false, reportUnusedVariable=warning, reportUntypedBaseClass=error
 import discord;
 import os
-from discord import channel
-from discord import activity
+from discord.utils import get
 import requests;
 import random;
 from dotenv import load_dotenv
@@ -49,10 +48,11 @@ async def on_message(message):
     user=message.author;
     if message.author == bot.user:
         return;
+#hello        
     if message.content.startswith('$hello'):
         await message.channel.send('hello ' + message.author.mention);
         print(f'Said Hello in {message.channel} of {message.guild}');
-        
+#reddit        
     if message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
@@ -61,7 +61,7 @@ async def on_message(message):
         e.set_footer(text=res.json()['subreddit']);
         await message.channel.send(embed=e);
         print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
-
+#info
     if message.content.startswith('$info'):
         if len(message.mentions)==0:
             m = getInfo(message.author);
@@ -72,7 +72,7 @@ async def on_message(message):
                 m = getInfo(user);
                 await message.channel.send(embed=m);
                 print(f'sent {user.id}\'s info in {message.guild}, {message.channel}');
-    
+#bored
     if message.content.startswith('$bored'):
         def check(m):
             return m.content!=None and m.channel==message.channel and m.author==message.author;
@@ -92,6 +92,7 @@ async def on_message(message):
         else:
             await message.channel.send('Sorry Invalid Input')
             print(f'{user.id} entered the wrong input')
+#joke
     if message.content.startswith('$joke'):
         if random.randint(0,10) >=3:
             res=requests.get(joke_api).json()
@@ -108,4 +109,47 @@ async def on_message(message):
             e=discord.Embed(title=res['setup'],description=res['punchline'],color=randColour())
             e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
             await message.channel.send(embed=e);
+#role, only allows one word roles for now, gotta fix
+    if message.content.startswith('$role') and user.guild_permissions.manage_roles and len(message.mentions)==1:
+        async def add_role(r,u):
+            role_to_add = get(message.guild.roles, name=r);
+            await message.channel.send(f'Would you like to assign {role_to_add} to <@{u[0].id}>\n `yes` or `no`');
+            def check(m2):
+                return m2.content!=None and m2.channel==message.channel and m2.author==message.author;
+            m2 = await bot.wait_for('message',check=check);
+            if m2.content.lower()=='yes':
+                await u[0].add_roles(role_to_add);
+            elif m2.content.lower()=='no':
+                await message.channel.send('Okay')
+            else:
+                await message.channel.send('invalid input')
+        msg = message.content.split(' ');
+        if len(msg)!=3:
+            await message.channel.send('Invalid Args');
+        else:
+            u = message.mentions;
+            if msg[2] not in message.mentions:
+                r = msg[2];
+            else:
+                r = msg[1];
+            if not get(message.guild.roles, name=r):
+                print(message.guild.roles)
+                await message.channel.send('Role doesn\'t exist, should I create it?\n `yes` or `no`')
+                def check(m):
+                    return m.content!=None and m.channel==message.channel and m.author==message.author;
+                m = await  bot.wait_for('message',check=check)
+                if m.content.lower() =='yes':
+                    await message.guild.create_role(name=r, permissions=user.guild_permissions, colour=randColour() ,reason=f'{user.id} created {r}')
+                    print(f'role \'{r}\' created in {m.guild}, {m.channel}');
+                    await add_role(r,u)
+                    await message.channel.send('Role was added')
+                    print(f'{user} added {r} to {u[0].id} in {message.guild}, {message.channel}')
+                elif m.content.lower()=='no':
+                    await message.channel.send('Okay');
+                else:
+                    await message.channel.send('invalid answer')
+            else:
+                await add_role(r,u)
+                await message.channel.send('Role was added')
+                print(f'{user} added {r} to {u[0].id} in {message.guild}, {message.channel}')
 bot.run(key)
