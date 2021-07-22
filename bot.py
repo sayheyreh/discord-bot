@@ -154,7 +154,8 @@ async def on_message(message):
                 return m.content!=None and m.channel==message.channel and m.author==message.author;
             m = await  bot.wait_for('message',check=check)
             if m.content.lower() =='yes':
-                await message.guild.create_role(name=r, permissions=user.guild_permissions, colour=randColour() ,reason=f'{user.id} created {r}')
+                everyonePerms = get(message.guild.roles, name="@everyone")
+                await message.guild.create_role(name=r, permissions=everyonePerms.permissions, colour=randColour() ,reason=f'{user.id} created {r}')
                 print(f'role \'{r}\' created in {m.guild}, {m.channel}');
                 await add_role(r,u)
             elif m.content.lower()=='no':
