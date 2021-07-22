@@ -36,6 +36,8 @@ def boredEmbed(user,res):
     e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url)
     e.set_footer(text=res['type'])
     return e;
+def checkRole(user,role):
+    return role in user.roles;
 
 @bot.event
 async def on_ready():
@@ -110,30 +112,37 @@ async def on_message(message):
             e.set_author(name=(user.display_name+'#'+user.discriminator),icon_url=user.avatar_url);
             await message.channel.send(embed=e);
 #role
-    if message.content.startswith('$role') and not user.guild_permissions.manage_roles:
+    if message.content.startswith('$add') and not user.guild_permissions.manage_roles and not message.mentions[0].guild_permissions.administrator:
+        print(f'{user} tried to use the `add` command')
         await message.channel.send('Insufficient Permissions');
-    elif message.content.startswith('$role') and user.guild_permissions.manage_roles and not len(message.mentions)==1:
+    elif message.content.startswith('$add') and user.guild_permissions.manage_roles and not len(message.mentions)==1:
         await message.channel.send('mention one person');
-    elif message.content.startswith('$role') and user.guild_permissions.manage_roles and len(message.mentions)==1:
+    elif message.content.startswith('$add') and user.guild_permissions.manage_roles and len(message.mentions)==1:
         async def add_role(r,u):
             role_to_add = get(message.guild.roles, name=r);
-            await message.channel.send(f'Would you like to assign {role_to_add} to <@{u[0].id}>\n`yes` or `no`');
-            def check(m2):
-                return m2.content!=None and m2.channel==message.channel and m2.author==message.author;
-            m2 = await bot.wait_for('message',check=check);
-            if m2.content.lower()=='yes':
-                await u[0].add_roles(role_to_add);
-                print(f'{user} added {r} to {u[0].id} in {message.guild}, {message.channel}')
-            elif m2.content.lower()=='no':
-                await message.channel.send('Okay')
+            if checkRole(u,role_to_add):
+                await message.channel.send('User already has the role');
+            elif (user.top_role<=u.top_role):
+                await message.channel.send('Insufficient Perms')
             else:
-                await message.channel.send('invalid input')
+                await message.channel.send(f'Would you like to assign {role_to_add} to <@{u.id}>\n`yes` or `no`');
+                def check(m2):
+                    return m2.content!=None and m2.channel==message.channel and m2.author==message.author;
+                m2 = await bot.wait_for('message',check=check);
+                if m2.content.lower()=='yes':
+                    await u.add_roles(role_to_add);
+                    print(f'{user} added {r} to {u.id} in {message.guild}, {message.channel}')
+                    await message.channel.send('Role was added')
+                elif m2.content.lower()=='no':
+                    await message.channel.send('Okay')
+                else:
+                    await message.channel.send('invalid input')
         msg = message.content.split(' ');
-        u = message.mentions;
+        u = message.mentions[0];
         r='';
-        if msg[1] != f'<@!{u[0].id}>':
-            print(msg[1],f'<@!{u[0].id}>')
-            await message.channel.send('the correct usage for the command is\n`$role <mention> [role_name]`')
+        if msg[1] != f'<@!{u.id}>':
+            print(msg[1],f'<@!{u.id}>')
+            await message.channel.send('the correct usage for the command is\n`$add <mention> [role_name]`')
             print('Incorrect usage of command');
             return 
         for x in msg[2:]:
@@ -154,6 +163,29 @@ async def on_message(message):
                 await message.channel.send('invalid answer')
         else:
             await add_role(r,u)
-            
-            print(f'{user} added {r} to {u[0].id} in {message.guild}, {message.channel}')
+#remove
+    if message.content.startswith('$remove') and not user.guild_permissions.manage_roles and not message.mentions[0].guild_permissions.administrator:
+        print(f'{user} tried to use the `remove` command')
+        await message.channel.send('Insufficient Permissions');
+    elif message.content.startswith('$remove') and user.guild_permissions.manage_roles and not len(message.mentions)==1:
+        await message.channel.send('mention one person');
+    elif message.content.startswith('$remove') and user.guild_permissions.manage_roles and len(message.mentions)==1:
+        msg = message.content.split(' ');
+        u = message.mentions[0];
+        r='';
+        if msg[1] != f'<@!{u.id}>':
+            print(msg[1],f'<@!{u.id}>')
+            await message.channel.send('the correct usage for the command is\n`$remove <mention> [role_name]`')
+            print('Incorrect usage of command');
+            return 
+        for x in msg[2:]:
+            r = r+' '+x;
+        r = r.strip();
+        role_to_remove = get(message.guild.roles, name=r);
+        if checkRole(u,role_to_remove):
+            await u.remove_roles(role_to_remove);
+            print('Role was removed');
+            await message.channel.send('Role was removed');
+        else:
+            await message.channel.send('User doesn\'t have the role');
 bot.run(key)
