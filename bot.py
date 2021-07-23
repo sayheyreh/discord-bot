@@ -190,7 +190,10 @@ async def on_message(message):
             await message.channel.send('Role was removed');
         else:
             await message.channel.send('User doesn\'t have the role');
-    if message.content.startswith('$delete'):
+#delete
+    if message.content.startswith('$delete') and not user.guild_permissions.manage_roles:
+        await message.channel.send('You do not have the permission to delete roles')
+    elif message.content.startswith('$delete') and user.guild_permissions.manage_roles:
         role = message.content[7:].strip();
         role_to_del = get(message.guild.roles, name=role);
         if role_to_del in message.guild.roles:
@@ -203,4 +206,5 @@ async def on_message(message):
                 print(f'Could not delete the role: {role_to_del}');
         else:
             await message.channel.send('Role does not exist');
+    
 bot.run(key)
