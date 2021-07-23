@@ -17,6 +17,7 @@ meme_api = 'https://meme-api.herokuapp.com/gimme/'
 bored_api = 'http://www.boredapi.com/api/'
 joke_api = 'https://v2.jokeapi.dev/joke/Any'
 another_joke_api = 'https://official-joke-api.appspot.com/jokes/random'
+kanye_api = 'https://api.kanye.rest/'
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -205,6 +206,9 @@ async def on_message(message):
                 await message.channel.send('I do not have the permission to delete this role')
                 print(f'Could not delete the role: {role_to_del}');
         else:
-            await message.channel.send('Role does not exist');
-    
+            await message.channel.send('Role does not exist');  
+    if 'kanye' in message.content.lower():
+        res = requests.get(kanye_api).json();
+        await message.channel.send(res['quote']);
+        print('sent kanye quote')
 bot.run(key)
