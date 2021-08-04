@@ -1,23 +1,37 @@
 # pyright: reportMissingImports=false, reportUnusedVariable=warning, reportUntypedBaseClass=error
-from logging import exception
 import discord;
 import os
-from discord.utils import get
 import requests;
 import random;
 from dotenv import load_dotenv
-
+from logging import exception
+from discord.utils import get
+from bs4 import BeautifulSoup
 #for the environment variables, in this case, the key   
 load_dotenv();
 
 bot = discord.Client();
-
 key = os.environ['API_KEY']
 meme_api = 'https://meme-api.herokuapp.com/gimme/'
 bored_api = 'http://www.boredapi.com/api/'
 joke_api = 'https://v2.jokeapi.dev/joke/Any'
 another_joke_api = 'https://official-joke-api.appspot.com/jokes/random'
 kanye_api = 'https://api.kanye.rest/'
+gif_domain = 'https://y.yarn.co/'
+gif_url = 'https://yarn.co/yarn-find'
+
+
+def scrape_query(query):
+    link= requests.get(url=gif_url,params={'text':query})
+    soup = BeautifulSoup(link.content,'html.parser')
+    print(link.url)
+    a = soup.find_all('div',attrs={'class':'pure-u-sm-1-2 pure-u-md-1-3 pure-u-lg-1-4 pure-u-xl-1-4'})
+    index = random.randrange(0,len(a)-1)
+    link_to_gif = gif_domain+a[index].a.get('href')[11:]+'_text.gif'
+    title = a[index].find('div',attrs={'class':'transcript db bg-w fwb p05 tal'}).text
+    movie = a[index].find('div',attrs={'class':'title ab fw5 p05 tal'}).text
+    a = [link_to_gif,title,movie]
+    return a
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -41,6 +55,9 @@ def boredEmbed(user,res):
 def checkRole(user,role):
     return role in user.roles;
 
+async def music(message):
+    await message.channel.send('dw')
+
 @bot.event
 async def on_ready():
     print('logged in as {0.user}'.format(bot));
@@ -52,6 +69,8 @@ async def on_message(message):
     user=message.author;
     if message.author == bot.user:
         return;
+    if message.content.startswith('$music'):
+        music(message);
 #hello        
     if message.content.startswith('$hello'):
         await message.channel.send('hello ' + message.author.mention);
@@ -211,4 +230,13 @@ async def on_message(message):
         res = requests.get(kanye_api).json();
         await message.channel.send(res['quote']);
         print('sent kanye quote')
+    if message.content.startswith('$gif'):
+        q = message.content[4:].strip()
+        gif_info = scrape_query(q)
+        #0-url, 1-title, 2-movie 
+        e = discord.Embed(title=gif_info[1],color=randColour())
+        e.set_image(url=gif_info[0])
+        e.set_footer(text=gif_info[2])
+        await message.channel.send(embed=e)
+        print(gif_info[0])
 bot.run(key)
