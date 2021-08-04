@@ -26,12 +26,22 @@ def scrape_query(query):
     soup = BeautifulSoup(link.content,'html.parser')
     print(link.url)
     a = soup.find_all('div',attrs={'class':'pure-u-sm-1-2 pure-u-md-1-3 pure-u-lg-1-4 pure-u-xl-1-4'})
-    index = random.randrange(0,len(a)-1)
-    link_to_gif = gif_domain+a[index].a.get('href')[11:]+'_text.gif'
-    title = a[index].find('div',attrs={'class':'transcript db bg-w fwb p05 tal'}).text
-    movie = a[index].find('div',attrs={'class':'title ab fw5 p05 tal'}).text
-    a = [link_to_gif,title,movie]
-    return a
+    if len(a)==0:
+        return -1
+    else:
+        #20 choices
+        weights=[]
+        for i in range(0,len(a)):
+            if i<4:
+                weights.append(100)
+            else:
+                weights.append(10)
+        a = random.choices(a,weights=weights,k=1)
+        link_to_gif = gif_domain+a[0].a.get('href')[11:]+'_text.gif'
+        title = a[0].find('div',attrs={'class':'transcript db bg-w fwb p05 tal'}).text
+        movie = a[0].find('div',attrs={'class':'title ab fw5 p05 tal'}).text
+        info = [link_to_gif,title,movie]
+        return info
 
 def randColour():
     return discord.Colour.from_rgb(random.randint(128, 255),random.randint(128, 255),random.randint(128, 255));
@@ -249,10 +259,13 @@ async def on_message(message):
     if message.content.startswith('$gif'):
         q = message.content[4:].strip()
         gif_info = scrape_query(q)
-        #0-url, 1-title, 2-movie 
-        e = discord.Embed(title=gif_info[1],color=randColour())
-        e.set_image(url=gif_info[0])
-        e.set_footer(text=gif_info[2])
-        await message.channel.send(embed=e)
-        print(gif_info[0])
+        if gif_info==-1:
+            await message.channel.send('No gifs were found')
+        else:
+            #0-url, 1-title, 2-movie 
+            e = discord.Embed(title=gif_info[1],color=randColour())
+            e.set_image(url=gif_info[0])
+            e.set_footer(text=gif_info[2])
+            await message.channel.send(embed=e)
+            print(gif_info[0])
 bot.run(key)
