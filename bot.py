@@ -61,7 +61,7 @@ async def music(message):
 @bot.event
 async def on_ready():
     print('logged in as {0.user}'.format(bot));
-    activity = discord.Game(name="testing",type=3)
+    activity = discord.Game(name="type $help",type=3)
     await bot.change_presence(status=discord.Status.online, activity=activity);
 
 @bot.event
