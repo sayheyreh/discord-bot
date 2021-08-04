@@ -71,6 +71,20 @@ async def on_message(message):
         return;
     if message.content.startswith('$music'):
         music(message);
+#help
+    if message.content.startswith('$help'):
+        e=discord.Embed(title='Commands',color=randColour())
+        e.add_field(name='$hello',value='replies with hello',inline=False)
+        e.add_field(name='$reddit', value='usage is `$reddit <subreddit>`\nor `$reddit` for default subs',inline=False)
+        e.add_field(name='$info',value='usage is `$info` for self\nor `$info <mention1> <mention2>` as many people as you want',inline=False)
+        e.add_field(name='$bored', value='after using the command, type any of the given options\n`education`,`recreational`,`social`\
+            ,`diy`,`charity`,`cooking`,`relaxation`,`music`,`busywork`\nif you do not have a preference, type `no`')
+        e.add_field(name='$joke', value='replied with a random joke',inline=False)
+        e.add_field(name='$add', value='requires the `MANAGE_ROLES` permission,\nusage is `$add <mention> [role_name]`',inline=False)
+        e.add_field(name='$remove', value='requires the `MANAGE_ROLES` permission\nusage is `$remove <mention> [role_name]`',inline=False)
+        e.add_field(name='$delete',value='requires the `MANAGE_ROLES` permission\nusage is `$delete [role_name]`',inline=False)
+        e.add_field(name='$gif',value='replies with a gif from a movie\nusage is `$gif [quote | word]`',inline=False)
+        await message.channel.send(embed=e)
 #hello        
     if message.content.startswith('$hello'):
         await message.channel.send('hello ' + message.author.mention);
@@ -226,10 +240,12 @@ async def on_message(message):
                 print(f'Could not delete the role: {role_to_del}');
         else:
             await message.channel.send('Role does not exist');  
+#kanye
     if 'kanye' in message.content.lower():
         res = requests.get(kanye_api).json();
         await message.channel.send(res['quote']);
         print('sent kanye quote')
+#gif
     if message.content.startswith('$gif'):
         q = message.content[4:].strip()
         gif_info = scrape_query(q)
