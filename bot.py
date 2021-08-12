@@ -1,4 +1,5 @@
 # pyright: reportMissingImports=false, reportUnusedVariable=warning, reportUntypedBaseClass=error
+import asyncio
 import discord;
 import os
 import requests;
@@ -102,6 +103,14 @@ async def on_message(message):
 #reddit        
     elif message.content.startswith('$reddit'): 
         subreddit = message.content[7:].strip();
+        res = requests.get(meme_api+subreddit);
+        e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
+        e.set_image(url=res.json()['preview'][-1])
+        e.set_footer(text=res.json()['subreddit']);
+        await message.channel.send(embed=e);
+        print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
+    elif message.content.startswith('$meme'):
+        subreddit = message.content[5:].strip();
         res = requests.get(meme_api+subreddit);
         e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
         e.set_image(url=res.json()['preview'][-1])
@@ -267,5 +276,43 @@ async def on_message(message):
             e.set_image(url=gif_info[0])
             e.set_footer(text=gif_info[2])
             await message.channel.send(embed=e)
-            print(gif_info[0])
+            print(gif_info[0]) 
+    #For Roles
+    if message.content.startswith('$t') and user.guild_permissions.manage_roles:
+        await message.channel.send('Enter the reaction message you would like to send:')
+        def checkMessage(m):
+            return m.content!=None and m.channel==message.channel and m.author==message.author
+        msg = await bot.wait_for('message',check=checkMessage)
+        storing_desc=msg.content
+        await message.channel.send('Enter the role name and react with the emoji you would like to represent it, in seperate lines\
+            \ne.g.`role_name` and react to it\ntype `exit` to finish')
+        roles = []
+        def checkReact(reaction,user):
+            return user==message.author and str(reaction.emoji)
+        while True:
+            msg = await bot.wait_for('message',check=checkMessage)
+            if msg.content == 'exit':
+                print('exitting')
+                break
+            try:
+                reaction,user = await bot.wait_for('reaction_add',timeout=60.0,check=checkReact)
+                roles.append(str(reaction.emoji))
+                await msg.add_reaction('👍')
+            except asyncio.TimeoutError:
+                await message.channel.send('Timed out')
+                print('timed out')
+                break
+        message = await message.channel.send(storing_desc)
+        for i in roles:
+            await add_reactions_to_message(message,i)
+        print('added reactions')
+
+        
+async def add_reactions_to_message(message,react):
+    try:
+        await message.add_reaction(react)
+    except:
+        await message.channel.send('I do not have that emoji')
 bot.run(key)
+
+#add event listener to see if people have reacted to the message, if they reacted then add the role for them
