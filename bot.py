@@ -291,7 +291,7 @@ async def on_message(message):
         # Replace sub-string in a string with a case-insensitive approach
         m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
         m = re.sub(r'i am','im',org_string,flags=re.IGNORECASE)
-        m = re.sub(r,'im','im',org_string,flags=re.IGNORECASE)
+        m = re.sub(r'im','im',org_string,flags=re.IGNORECASE)
         print(f'sent dad joke')
         index = m.index('im')+2
         reply = m[index:].strip()
