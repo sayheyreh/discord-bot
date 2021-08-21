@@ -2,6 +2,7 @@
 import asyncio
 import discord;
 import os
+import re
 from discord import reaction
 from discord import colour
 import requests;
@@ -285,10 +286,15 @@ async def on_message(message):
             e.set_footer(text=gif_info[2])
             await message.channel.send(embed=e)
             print(gif_info[0]) 
-    if 'i\'m' in message.content.lower() or 'im' in message.content.lower():
-        msg = message.content.replace('i\'m','im')
-        index = message.content.index('im')+2
-        reply = msg[index:].strip()
+    if 'i\'m ' in message.content.lower() or 'im ' in message.content.lower() or 'i am ' in message.content.lower():
+        org_string = message.content
+        # Replace sub-string in a string with a case-insensitive approach
+        m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
+        m = re.sub(r'i am','im',org_string,flags=re.IGNORECASE)
+        m = re.sub(r,'im','im',org_string,flags=re.IGNORECASE)
+        print(f'sent dad joke')
+        index = m.index('im')+2
+        reply = m[index:].strip()
         await message.channel.send(f'hi {reply}, I\'m Rehaan')
     
 # hard coded for my server
