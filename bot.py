@@ -2,6 +2,8 @@
 import asyncio
 import discord;
 import os
+from discord import reaction
+from discord import colour
 import requests;
 import random;
 from dotenv import load_dotenv
@@ -73,7 +75,7 @@ async def music(message):
 async def on_ready():
     print('logged in as {0.user}'.format(bot));
     activity = discord.Game(name="type $help",type=3)
-    await bot.change_presence(status=discord.Status.online, activity=activity);
+    await bot.change_presence(status=discord.Status.online, activity=activity)
 
 @bot.event
 async def on_message(message):
@@ -85,16 +87,20 @@ async def on_message(message):
 #help
     if message.content.startswith('$help'):
         e=discord.Embed(title='Commands',color=randColour())
-        e.add_field(name='$hello',value='replies with hello',inline=False)
-        e.add_field(name='$reddit', value='usage is `$reddit <subreddit>`\nor `$reddit` for default subs',inline=False)
-        e.add_field(name='$info',value='usage is `$info` for self\nor `$info <mention1> <mention2>` as many people as you want',inline=False)
-        e.add_field(name='$bored', value='after using the command, type any of the given options\n`education`,`recreational`,`social`\
-            ,`diy`,`charity`,`cooking`,`relaxation`,`music`,`busywork`\nif you do not have a preference, type `no`')
-        e.add_field(name='$joke', value='replied with a random joke',inline=False)
-        e.add_field(name='$add', value='requires the `MANAGE_ROLES` permission,\nusage is `$add <mention> [role_name]`',inline=False)
-        e.add_field(name='$remove', value='requires the `MANAGE_ROLES` permission\nusage is `$remove <mention> [role_name]`',inline=False)
-        e.add_field(name='$delete',value='requires the `MANAGE_ROLES` permission\nusage is `$delete [role_name]`',inline=False)
-        e.add_field(name='$gif',value='replies with a gif from a movie\nusage is `$gif [quote | word]`',inline=False)
+        print(message.content[5:].strip())
+        if message.content[5:].strip() == '2':
+            e.title='Role Commands'
+            e.add_field(name='$add', value='requires the `MANAGE_ROLES` permission,\nusage is `$add <mention> [role_name]`',inline=False)
+            e.add_field(name='$remove', value='requires the `MANAGE_ROLES` permission\nusage is `$remove <mention> [role_name]`',inline=False)
+            e.add_field(name='$delete',value='requires the `MANAGE_ROLES` permission\nusage is `$delete [role_name]`',inline=False)
+        else:
+            e.add_field(name='$hello',value='replies with hello',inline=False)
+            e.add_field(name='$reddit', value='usage is `$reddit <subreddit>`\nor `$reddit` for default subs',inline=False)
+            e.add_field(name='$info',value='usage is `$info` for self\nor `$info <mention1> <mention2>` as many people as you want',inline=False)
+            e.add_field(name='$bored', value='after using the command, type any of the given options\n`education`,`recreational`,`social`\
+                ,`diy`,`charity`,`cooking`,`relaxation`,`music`,`busywork`\nif you do not have a preference, type `no`')
+            e.add_field(name='$joke', value='replied with a random joke',inline=False)
+            e.add_field(name='$gif',value='replies with a gif from a movie\nusage is `$gif [quote | word]`',inline=False)
         await message.channel.send(embed=e)
 #hello        
     if message.content.startswith('$hello'):
@@ -277,42 +283,31 @@ async def on_message(message):
             e.set_footer(text=gif_info[2])
             await message.channel.send(embed=e)
             print(gif_info[0]) 
-    #For Roles
-    if message.content.startswith('$t') and user.guild_permissions.manage_roles:
-        await message.channel.send('Enter the reaction message you would like to send:')
-        def checkMessage(m):
-            return m.content!=None and m.channel==message.channel and m.author==message.author
-        msg = await bot.wait_for('message',check=checkMessage)
-        storing_desc=msg.content
-        await message.channel.send('Enter the role name and react with the emoji you would like to represent it, in seperate lines\
-            \ne.g.`role_name` and react to it\ntype `exit` to finish')
-        roles = []
-        def checkReact(reaction,user):
-            return user==message.author and str(reaction.emoji)
-        while True:
-            msg = await bot.wait_for('message',check=checkMessage)
-            if msg.content == 'exit':
-                print('exitting')
-                break
-            try:
-                reaction,user = await bot.wait_for('reaction_add',timeout=60.0,check=checkReact)
-                roles.append(str(reaction.emoji))
-                await msg.add_reaction('👍')
-            except asyncio.TimeoutError:
-                await message.channel.send('Timed out')
-                print('timed out')
-                break
-        message = await message.channel.send(storing_desc)
-        for i in roles:
-            await add_reactions_to_message(message,i)
-        print('added reactions')
-
-        
-async def add_reactions_to_message(message,react):
-    try:
-        await message.add_reaction(react)
-    except:
-        await message.channel.send('I do not have that emoji')
+    if 'i\'m' in message.content.lower() or 'im' in message.content.lower():
+        msg = message.content.replace('i\'m','im')
+        index = message.content.index('im')+2
+        reply = msg[index:].strip()
+        await message.channel.send(f'hi {reply}, I\'m Rehaan')
+    
+# hard coded for my server
+# react_roles_id='875390612642336821'
+# @bot.event
+# async def on_raw_reaction_add(payload):
+#     react = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+#     #get the role the emoji is linked to
+#     emoji = payload.emoji
+#     role_to_add = get(react.guild.roles, name=emoji)
+#     user = react.author
+#     await user.add_roles(role_to_add)
+#     print('reaction was added',user)
+# @bot.event
+# async def on_raw_reaction_remove(payload):
+#     react = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+#     #get the role the emoji is linked to
+#     emoji = payload.emoji
+#     role_to_remove = get(react.guild.roles, name=emoji)
+    
+#     print('reaction was removed',react.author)
 bot.run(key)
 
 #add event listener to see if people have reacted to the message, if they reacted then add the role for them
