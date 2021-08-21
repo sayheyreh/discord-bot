@@ -268,7 +268,9 @@ async def on_message(message):
 #kanye
     if 'kanye' in message.content.lower():
         res = requests.get(kanye_api).json();
-        await message.channel.send(res['quote']);
+        e=discord.Embed(title=res['quote'],color=randColour())
+        e.set_footer(text='kanye')
+        await message.channel.send(embed=e);
         print('sent kanye quote')
 #gif
     if message.content.startswith('$gif'):
