@@ -290,9 +290,10 @@ async def on_message(message):
         org_string = message.content
         # Replace sub-string in a string with a case-insensitive approach
         m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
-        m = re.sub(r'i am','im',org_string,flags=re.IGNORECASE)
-        m = re.sub(r'im','im',org_string,flags=re.IGNORECASE)
+        m = re.sub(r'i am','im',m,flags=re.IGNORECASE)
+        m = re.sub(r'im','im',m,flags=re.IGNORECASE)
         print(f'sent dad joke')
+        print(m)
         index = m.index('im')+2
         reply = m[index:].strip()
         await message.channel.send(f'hi {reply}, I\'m Rehaan')
