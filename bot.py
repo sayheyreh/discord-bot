@@ -114,7 +114,7 @@ async def on_message(message):
         e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
         e.set_image(url=res.json()['preview'][-1])
         e.set_footer(text=res.json()['subreddit']);
-        await message.channel.send(embed=e);
+        await message.channel.send(embed=e)
         print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
     elif message.content.startswith('$meme'):
         subreddit = message.content[5:].strip();
@@ -294,7 +294,7 @@ async def on_message(message):
         m = re.sub(r'im','im',m,flags=re.IGNORECASE)
         print(f'sent dad joke')
         print(m)
-        index = m.index('im')+2
+        index = m.rindex('im')+2
         reply = m[index:].strip()
         await message.channel.send(f'hi {reply}, I\'m Rehaan')
     
