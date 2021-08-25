@@ -287,7 +287,7 @@ async def on_message(message):
             await message.channel.send(embed=e)
             print(gif_info[0]) 
     if message.author.id in bad_people:
-        if random.randint(0,10) >=7:
+        if random.randint(0,1000) >=950:
             await message.add_reaction('🤮')
             print('reacted')
     if message.author.id == 224425803306369034 and splitted[0] == '$loser':
@@ -296,7 +296,12 @@ async def on_message(message):
         else:
             bad_people.append(message.mentions[0].id)
             print(bad_people)
-
+    if message.author.id==224425803306369034 and splitted[0]=='$notloser':
+        if message.mentions==None:
+            await  message.channel.send('Mention someone')
+        else:
+            bad_people.pop(message.mentions[0].id)
+            print(bad_people)
 # hard coded for my server
 # react_roles_id='875390612642336821'
 # @bot.event
