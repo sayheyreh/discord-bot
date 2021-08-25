@@ -287,7 +287,7 @@ async def on_message(message):
             await message.channel.send(embed=e)
             print(gif_info[0]) 
     if message.author.id in bad_people:
-        if random.randint(0,1000) >=850:
+        if random.randint(0,1000) >=500:
             await message.add_reaction('🤮')
             print('reacted')
     if message.author.id == 224425803306369034 and splitted[0] == '$loser':
