@@ -84,10 +84,9 @@ async def on_message(message):
     user=message.author;
     if message.author == bot.user:
         return;
-    if message.content.startswith('$music'):
-        music(message);
+    splitted = message.content.split(' ')
 #help
-    if message.content.startswith('$help'):
+    if splitted[0] == '$help':
         e=discord.Embed(title='Commands',color=randColour())
         print(message.content[5:].strip())
         if message.content[5:].strip() == '2':
@@ -105,11 +104,11 @@ async def on_message(message):
             e.add_field(name='$gif',value='replies with a gif from a movie\nusage is `$gif [quote | word]`',inline=False)
         await message.channel.send(embed=e)
 #hello        
-    if message.content.startswith('$hello'):
+    if splitted[0] == '$hello':
         await message.channel.send('hello ' + message.author.mention);
         print(f'Said Hello in {message.channel} of {message.guild}');
 #reddit        
-    elif message.content.startswith('$reddit'): 
+    elif splitted[0] == '$reddit': 
         subreddit = message.content[7:].strip();
         res = requests.get(meme_api+subreddit);
         e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
@@ -117,7 +116,7 @@ async def on_message(message):
         e.set_footer(text=res.json()['subreddit']);
         await message.channel.send(embed=e)
         print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
-    elif message.content.startswith('$meme'):
+    elif splitted[0] == '$meme':
         subreddit = message.content[5:].strip();
         res = requests.get(meme_api+subreddit);
         e=discord.Embed(title=res.json()['title'],url=res.json()['postLink'],color=randColour());
@@ -126,7 +125,7 @@ async def on_message(message):
         await message.channel.send(embed=e);
         print(f"sent image from {res.json()['subreddit']} to {message.guild}, {message.channel}");
 #info
-    elif message.content.startswith('$info'):
+    elif splitted[0] == '$info':
         if len(message.mentions)==0:
             m = getInfo(message.author);
             await message.channel.send(embed=m);
@@ -137,7 +136,7 @@ async def on_message(message):
                 await message.channel.send(embed=m);
                 print(f'sent {user.id}\'s info in {message.guild}, {message.channel}');
 #bored
-    elif message.content.startswith('$bored'):
+    elif splitted[0] == '$bored':
         def check(m):
             return m.content!=None and m.channel==message.channel and m.author==message.author;
         await message.channel.send('Any type you prefer?\n`education`,`recreational`,`social`,`diy`,`charity`,`cooking`,`relaxation`,`music`,`busywork`\nif you do not have a preference, type `no`');
@@ -157,7 +156,7 @@ async def on_message(message):
             await message.channel.send('Sorry Invalid Input')
             print(f'{user.id} entered the wrong input')
 #joke
-    elif message.content.startswith('$joke'):
+    elif splitted[0] == '$joke':
         if random.randint(0,10) >=3:
             res=requests.get(joke_api).json()
             if res['type']=='twopart':
@@ -287,26 +286,16 @@ async def on_message(message):
             e.set_footer(text=gif_info[2])
             await message.channel.send(embed=e)
             print(gif_info[0]) 
-    # if 'i\'m ' in message.content.lower() or 'im ' in message.content.lower() or 'i am ' in message.content.lower():
-    #     org_string = message.content
-    #     # Replace sub-string in a string with a case-insensitive approach
-    #     m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
-    #     m = re.sub(r'i am','im',m,flags=re.IGNORECASE)
-    #     m = re.sub(r'im','im',m,flags=re.IGNORECASE)
-    #     print(f'sent dad joke')
-    #     print(m)
-    #     print(user)
-    #     index = m.rindex('im')+2
-    #     reply = m[index:].strip()
-    #     await message.channel.send(f'hi {reply}, I\'m Rehaan')
-    
-
-@bot.event
-async def on_message(message):
     if message.author.id in bad_people:
-        if random.randint(0,4) >=3:
+        if random.randint(0,10) >=7:
             await message.add_reaction('🤮')
             print('reacted')
+    if message.author.id == 224425803306369034 and splitted[0] == '$loser':
+        if message.mentions==None:
+            await message.channel.send('Mention someone')
+        else:
+            bad_people.append(message.mentions[0].id)
+            print(bad_people)
 
 # hard coded for my server
 # react_roles_id='875390612642336821'
