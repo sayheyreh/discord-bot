@@ -24,6 +24,7 @@ kanye_api = 'https://api.kanye.rest/'
 gif_domain = 'https://y.yarn.co/'
 gif_url = 'https://yarn.co/yarn-find'
 
+bad_people=[]
 
 def scrape_query(query):
     link= requests.get(url=gif_url,params={'text':query})
@@ -286,18 +287,27 @@ async def on_message(message):
             e.set_footer(text=gif_info[2])
             await message.channel.send(embed=e)
             print(gif_info[0]) 
-    if 'i\'m ' in message.content.lower() or 'im ' in message.content.lower() or 'i am ' in message.content.lower():
-        org_string = message.content
-        # Replace sub-string in a string with a case-insensitive approach
-        m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
-        m = re.sub(r'i am','im',m,flags=re.IGNORECASE)
-        m = re.sub(r'im','im',m,flags=re.IGNORECASE)
-        print(f'sent dad joke')
-        print(m)
-        index = m.rindex('im')+2
-        reply = m[index:].strip()
-        await message.channel.send(f'hi {reply}, I\'m Rehaan')
+    # if 'i\'m ' in message.content.lower() or 'im ' in message.content.lower() or 'i am ' in message.content.lower():
+    #     org_string = message.content
+    #     # Replace sub-string in a string with a case-insensitive approach
+    #     m = re.sub(r'i\'m','im', org_string, flags=re.IGNORECASE)
+    #     m = re.sub(r'i am','im',m,flags=re.IGNORECASE)
+    #     m = re.sub(r'im','im',m,flags=re.IGNORECASE)
+    #     print(f'sent dad joke')
+    #     print(m)
+    #     print(user)
+    #     index = m.rindex('im')+2
+    #     reply = m[index:].strip()
+    #     await message.channel.send(f'hi {reply}, I\'m Rehaan')
     
+
+@bot.event
+async def on_message(message):
+    if message.author.id in bad_people:
+        if random.randint(0,4) >=3:
+            await message.add_reaction('🤮')
+            print('reacted')
+
 # hard coded for my server
 # react_roles_id='875390612642336821'
 # @bot.event
