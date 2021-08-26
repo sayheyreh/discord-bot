@@ -270,10 +270,14 @@ async def on_message(message):
         else:
             await message.channel.send('Role does not exist');  
 #kanye
-    if 'kanye' in message.content.lower():
+    if 'kanye' in message.content.lower(): 
         res = requests.get(kanye_api).json();
+        manual_quotes=['i like ur tiddies because they prove i can focus on two things at once',\
+            'none of us would be here without cum']
         e=discord.Embed(title=res['quote'],color=randColour())
         e.set_footer(text='kanye')
+        if random.randint(0,100)>=90:
+            e.title=random.choice(manual_quotes)
         await message.channel.send(embed=e);
         print('sent kanye quote')
 #gif
