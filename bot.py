@@ -23,7 +23,9 @@ another_joke_api = 'https://official-joke-api.appspot.com/jokes/random'
 kanye_api = 'https://api.kanye.rest/'
 gif_domain = 'https://y.yarn.co/'
 gif_url = 'https://yarn.co/yarn-find'
-goju_url='https://wall.alphacoders.com/tag/satoru-gojo-wallpapers'
+anime_urls = ['https://wall.alphacoders.com/by_category.php?id=3&name=Anime+Wallpapers',\
+    'https://wall.alphacoders.com/tag/satoru-gojo-wallpapers']
+
 
 bad_people=[]
 
@@ -310,7 +312,7 @@ async def on_message(message):
 
 #Temp Command
     if splitted[0]=='$kaf':
-        res = requests.get(goju_url)
+        res = requests.get(random.choice(anime_urls))
         soup = BeautifulSoup(res.content,'html.parser')
 
         pictures = soup.find_all('picture')
