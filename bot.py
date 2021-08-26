@@ -23,6 +23,7 @@ another_joke_api = 'https://official-joke-api.appspot.com/jokes/random'
 kanye_api = 'https://api.kanye.rest/'
 gif_domain = 'https://y.yarn.co/'
 gif_url = 'https://yarn.co/yarn-find'
+goju_url='https://wall.alphacoders.com/tag/satoru-gojo-wallpapers'
 
 bad_people=[]
 
@@ -306,6 +307,21 @@ async def on_message(message):
             print(bad_people)
     if splitted[0] == 'checkList':
         await message.channel.send(str(bad_people))
+
+#Temp Command
+    if splitted[0]=='$kaf':
+        res = requests.get(goju_url)
+        soup = BeautifulSoup(res.content,'html.parser')
+
+        pictures = soup.find_all('picture')
+
+        p = random.choice(pictures)
+
+        e = p.find('img').get('src')
+        await message.delete()
+        await message.channel.send(e)
+        print('sent kaf')
+
 # hard coded for my server
 # react_roles_id='875390612642336821'
 # @bot.event
