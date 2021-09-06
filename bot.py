@@ -305,7 +305,7 @@ async def on_message(message):
             await message.channel.send('added')
             print(bad_people)
     if message.author.id==224425803306369034 and splitted[0]=='$notloser':
-        if message.mentions==None:
+        if len(message.mentions)==0:
             await  message.channel.send('Mention someone')
         else:
             bad_people.remove(message.mentions[0].id)
@@ -313,7 +313,28 @@ async def on_message(message):
             print(bad_people)
     if splitted[0] == 'checkList':
         await message.channel.send(str(bad_people))
-
+    if splitted[0]=='$pp':
+        def find_pp_size():
+            pp='8'
+            for i in range(0,random.randint(0,10)):
+                pp+='='
+            pp+='D'
+            return pp
+        async def send_pp(message,person):
+            e=discord.Embed(title='pp machine',colour=randColour())
+            if person.id==224425803306369034:
+                e.add_field(name=f'{person}\' pp size', value='8=========================D')
+            else:
+                e.add_field(name=f'{person}\' pp size', value=find_pp_size())
+            await message.channel.send(embed=e)
+        if not message.mentions:
+            print('test')
+            await send_pp(message,message.author)
+        else:
+            print('test2')
+            print(message.mentions)
+            for i in message.mentions:
+                await send_pp(message,i)
 #Temp Command
     if splitted[0]=='$kaf':
         res = requests.get(random.choice(anime_urls))
