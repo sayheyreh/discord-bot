@@ -25,7 +25,7 @@ gif_domain = 'https://y.yarn.co/'
 gif_url = 'https://yarn.co/yarn-find'
 anime_urls = ['https://wall.alphacoders.com/by_category.php?id=3&name=Anime+Wallpapers',\
     'https://wall.alphacoders.com/tag/satoru-gojo-wallpapers']
-
+urban_url='https://www.urbandictionary.com/'
 
 bad_people=[]
 
@@ -316,13 +316,13 @@ async def on_message(message):
     if splitted[0]=='$pp':
         def find_pp_size():
             pp='8'
-            for i in range(0,random.randint(0,10)):
+            for i in range(0,random.randint(0,20)):
                 pp+='='
             pp+='D'
             return pp
         async def send_pp(message,person):
             e=discord.Embed(title='pp machine',colour=randColour())
-            if person.id==224425803306369034:
+            if person.id==224425803306369034 or person.id==716156113766318151:
                 e.add_field(name=f'{person}\' pp size', value='8=========================D')
             else:
                 e.add_field(name=f'{person}\' pp size', value=find_pp_size())
@@ -335,6 +335,12 @@ async def on_message(message):
             print(message.mentions)
             for i in message.mentions:
                 await send_pp(message,i)
+    if splitted[0]=='$urban':
+        query = message.content[6:].strip()
+        link= requests.get(url=gif_url,params={'Term':query})
+        soup = BeautifulSoup(link.content,'html.parser')
+        top = soup.find_all('div',attrs={'class':'ribbon'})
+
 #Temp Command
     if splitted[0]=='$kaf':
         res = requests.get(random.choice(anime_urls))
