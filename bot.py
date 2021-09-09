@@ -1,5 +1,6 @@
 # pyright: reportMissingImports=false, reportUnusedVariable=warning, reportUntypedBaseClass=error
 import asyncio
+from datetime import time
 import discord;
 import os
 import re
@@ -25,7 +26,7 @@ gif_domain = 'https://y.yarn.co/'
 gif_url = 'https://yarn.co/yarn-find'
 anime_urls = ['https://wall.alphacoders.com/by_category.php?id=3&name=Anime+Wallpapers',\
     'https://wall.alphacoders.com/tag/satoru-gojo-wallpapers']
-urban_url='https://www.urbandictionary.com/'
+insult_api = 'https://insult.mattbas.org/api/insult'
 
 bad_people=[]
 
@@ -294,10 +295,42 @@ async def on_message(message):
             await message.channel.send(embed=e)
             print(gif_info[0]) 
     if message.author.id in bad_people:
-        if random.randint(0,1000) >=500:
+        #1/4th chance of reacting
+        if random.choice([False,False,False,True]):
             await message.add_reaction('🤮')
             print('reacted')
-    if message.author.id == 224425803306369034 and splitted[0] == '$loser':
+        if random.randint(0,3)==3:
+            res = requests.get(url=insult_api,params={'who':message.author.display_name})
+            await message.channel.send(res.text)
+            print('insulted')
+    if splitted[0]=='$insult':
+        if len(message.mentions)==0:
+            await message.channel.send('mention a user:')
+            def check(m):
+                return m.content!=None and m.channel==message.channel and m.author==message.author;
+            try:
+                m = await  bot.wait_for('message',check=check,timeout=30.0)
+                if len(m.mentions)==0:
+                    await message.channel.send('damn you didnt mention properly')
+                else:
+                    for i in m.mentions:
+                        if i.id == 224425803306369034 or 'rehaan' in i.display_name:
+                            res = requests.get(url=insult_api,params={'who':message.author.display_name})
+                            print('tried roasting OWNER LOL')
+                        else:
+                            res = requests.get(url=insult_api,params={'who':i.display_name})
+                        await message.channel.send(res.text)
+            except TimeoutError:
+                await message.channel.send('timed out')
+        else:
+            for i in message.mentions:
+                if i.id == 224425803306369034 or 'rehaan' in i.display_name:
+                     res = requests.get(url=insult_api,params={'who':message.author.display_name})
+                     print('tried roasting OWNER LOL')
+                else:
+                    res = requests.get(url=insult_api,params={'who':i.display_name})
+                await message.channel.send(res.text)
+    if message.author.id == 224425803306369034 and splitted[0] == '$loser': #change this before push
         if message.mentions==None:
             await message.channel.send('Mention someone')
         else:
@@ -311,12 +344,14 @@ async def on_message(message):
             bad_people.remove(message.mentions[0].id)
             await message.channel.send('removed')
             print(bad_people)
+    if message.author.id==224425803306369034 and splitted[0]=='$clear':
+        splitted.clear()
     if splitted[0] == 'checkList':
         await message.channel.send(str(bad_people))
     if splitted[0]=='$pp':
         def find_pp_size():
             pp='8'
-            for i in range(0,random.randint(0,20)):
+            for i in range(0,random.randint(3,20)):
                 pp+='='
             pp+='D'
             return pp
@@ -335,11 +370,6 @@ async def on_message(message):
             print(message.mentions)
             for i in message.mentions:
                 await send_pp(message,i)
-    if splitted[0]=='$urban':
-        query = message.content[6:].strip()
-        link= requests.get(url=gif_url,params={'Term':query})
-        soup = BeautifulSoup(link.content,'html.parser')
-        top = soup.find_all('div',attrs={'class':'ribbon'})
 
 #Temp Command
     if splitted[0]=='$kaf':
