@@ -296,13 +296,15 @@ async def on_message(message):
             print(gif_info[0]) 
     if message.author.id in bad_people:
         #1/4th chance of reacting
-        if random.choice([False,False,False,True]):
-            await message.add_reaction('🤮')
-            print('reacted')
-        if random.randint(0,3)==3:
-            res = requests.get(url=insult_api,params={'who':message.author.display_name})
-            await message.channel.send(res.text)
-            print('insulted')
+        # if random.choice([False,False,False,True]):
+        #     await message.add_reaction('🤮')
+        #     print('reacted')
+        # if random.randint(0,3)==3:
+        #     res = requests.get(url=insult_api,params={'who':message.author.display_name})
+        #     await message.channel.send(res.text)
+        #     print('insulted')
+        await message.delete(delay=1)
+        print(f'deleted {message}')
     if splitted[0]=='$insult':
         if len(message.mentions)==0:
             await message.channel.send('mention a user:')
