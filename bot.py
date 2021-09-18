@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from logging import exception
 from discord.utils import get
 from bs4 import BeautifulSoup
+from AnilistPython import Anilist
 #for the environment variables, in this case, the key   
 load_dotenv();
 
@@ -372,7 +373,11 @@ async def on_message(message):
             print(message.mentions)
             for i in message.mentions:
                 await send_pp(message,i)
-
+    if message.author.id==224425803306369034 and splitted[0]=='$kick':
+        await message.delete()
+        for i in message.mentions:
+            await i.kick()
+            print(f'kicked {i.id}')
 #Temp Command
     if splitted[0]=='$kaf':
         res = requests.get(random.choice(anime_urls))

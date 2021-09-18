@@ -1,0 +1,1 @@
+from AnilistPython import Anilist

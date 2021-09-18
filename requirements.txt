@@ -2,3 +2,4 @@ discord
 requests
 python-dotenv
 bs4
+AnilistPython
