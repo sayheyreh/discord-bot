@@ -28,6 +28,7 @@ gif_url = 'https://yarn.co/yarn-find'
 anime_urls = ['https://wall.alphacoders.com/by_category.php?id=3&name=Anime+Wallpapers',\
     'https://wall.alphacoders.com/tag/satoru-gojo-wallpapers']
 insult_api = 'https://insult.mattbas.org/api/insult'
+chess_url='https://api.chess.com/pub/puzzle/random'
 
 bad_people=[]
 
@@ -378,6 +379,14 @@ async def on_message(message):
         for i in message.mentions:
             await i.kick()
             print(f'kicked {i.id}')
+    if splitted[0]=='$chess':
+        res = requests.get(chess_url)
+        image = res.json()['image']
+        e=discord.Embed(title=res.json['title'],colour=randColour())
+        e.set_footer(text="Puzzle from chess.com")
+        e.set_image(url=image)
+        e.add_field(name="pgn",value=res.json()['pgn'])
+        await message.channel.send(embed=e)
 #Temp Command
     if splitted[0]=='$kaf':
         res = requests.get(random.choice(anime_urls))
