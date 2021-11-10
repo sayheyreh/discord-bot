@@ -382,7 +382,7 @@ async def on_message(message):
     if splitted[0]=='$chess':
         res = requests.get(chess_url)
         image = res.json()['image']
-        e=discord.Embed(title=res.json['title'],colour=randColour())
+        e=discord.Embed(title=res.json()['title'],colour=randColour())
         e.set_footer(text="Puzzle from chess.com")
         e.set_image(url=image)
         e.add_field(name="pgn",value=res.json()['pgn'])
